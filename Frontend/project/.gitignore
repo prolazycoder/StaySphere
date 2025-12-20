@@ -1,0 +1,17 @@
+demo/src/main/resources/application.properties
+application.properties
+application.yml
+
+# Build
+demo/target/
+*.class
+*.jar
+*.war
+
+# IDE files
+*.iml
+.idea/
+.vscode/
+
+# Logs
+*.log

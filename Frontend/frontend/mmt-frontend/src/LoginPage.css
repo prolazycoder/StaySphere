@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+/* ===========================
+   BACKGROUND CONTAINER
+=========================== */
+.login-container {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  animation: fadeInBg 1.2s ease-out;
+}
+
+@keyframes fadeInBg {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===========================
+   GLASS CARD
+=========================== */
+.glass-card {
+  position: absolute;
+  top: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 92%;
+  max-width: 900px;
+
+  padding: 25px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 18px;
+
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+
+  transition: all 0.3s ease;
+  animation: popUp 0.6s ease-out;
+}
+
+@keyframes popUp {
+  from { transform: translate(-50%, -20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* ===========================
+      MAIN TITLE
+=========================== */
+.title {
+  font-family: "Great Vibes", cursive;
+  font-size: 4.5rem;
+  font-weight: 600;
+  color: black;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ===========================
+   ERROR MESSAGE
+=========================== */
+.error-msg {
+  background: rgba(255, 0, 0, 0.15);
+  border-left: 4px solid red;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  color: rgb(120, 0, 0);
+  width: 80%;
+  text-align: center;
+  font-size: 0.9rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===========================
+   MAIN LOGIN OPTIONS
+=========================== */
+.options {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
+  padding: 15px 20px;
+  border-radius: 12px;
+  
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255,255,255,0.6);
+  backdrop-filter: blur(6px);
+
+  transition: 0.25s ease;
+}
+
+.option span {
+  margin-top: 6px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: black;
+}
+
+.option:hover {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.55);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ===========================
+   INPUT PANEL (OTP UI)
+=========================== */
+.input-panel {
+  width: 100%;
+  margin-top: 15px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* INPUT STYLE */
+.input-box {
+  width: 75%;
+  padding: 14px 18px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.35);
+  background: rgba(255,255,255,0.7);
+
+  margin-bottom: 15px;
+  font-size: 1rem;
+
+  transition: 0.2s ease;
+}
+
+.input-box:focus {
+  border-color: black;
+  outline: none;
+  background: rgba(255,255,255,0.85);
+}
+
+/* ACTION BUTTON */
+.action-btn {
+  background: linear-gradient(to right, black, #333);
+  color: white;
+
+  padding: 12px 22px;
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+
+  transition: 0.25s ease;
+}
+
+.action-btn:hover {
+  background: linear-gradient(to right, #222, black);
+  transform: scale(1.04);
+}
+
+/* BACK BUTTON */
+.back-btn {
+  background: none;
+  border: none;
+  margin-top: 8px;
+
+  font-size: 1rem;
+  font-weight: 600;
+  color: black;
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+  transform: scale(1.05);
+}
+
+/* ===========================
+      RESPONSIVE UI
+=========================== */
+@media (max-width: 850px) {
+  .glass-card {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 3.4rem;
+  }
+
+  .options {
+    flex-direction: column;
+    gap: 20px;
+    width: 80%;
+  }
+}
+
+@media (max-width: 500px) {
+  .title {
+    font-size: 2.6rem;
+  }
+
+  .input-box {
+    width: 90%;
+  }
+
+  .glass-card {
+    padding: 15px;
+  }
+}
