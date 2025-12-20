@@ -51,7 +51,5 @@ StaySphere is a full-stack travel and accommodation management platform that all
 - Git & GitHub
 - Postman (API testing)
 
----
 
-## 📂 Project Structure
 
