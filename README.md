@@ -1,6 +1,6 @@
-# StaySphere 🏨🌍
+# StaySphere 🏨🚕🌍
 
-StaySphere is a full-stack accommodation booking and management platform designed to provide users with a seamless experience for discovering, booking, and managing stays. The application focuses on scalability, clean architecture, and real-world backend practices using Java.
+StaySphere is a full-stack travel and accommodation management platform that allows users to book stays **and cabs** through a single integrated system. The platform is designed using a Java-based backend architecture with a modern web frontend, focusing on scalability, security, and real-world use cases.
 
 ---
 
@@ -11,13 +11,23 @@ StaySphere is a full-stack accommodation booking and management platform designe
 - Browse and search available stays
 - View detailed property information
 - Book accommodations
-- Manage bookings and user profile
+- **Book cabs for travel between locations**
+- View booking history (stays & cabs)
+- Manage user profile
+
+### 🚕 Cab Booking Features
+- Search available cabs by location
+- Select cab type (e.g., economy, premium)
+- View fare estimation
+- Book and cancel cab rides
+- Track cab booking status
 
 ### 🏢 Admin Features
 - Add, update, and delete property listings
-- Manage users and bookings
+- Manage cab listings and availability
+- Manage users and all bookings
 - Approve or reject property listings
-- Dashboard for monitoring platform activity
+- Admin dashboard for monitoring platform activity
 
 ---
 
@@ -26,10 +36,10 @@ StaySphere is a full-stack accommodation booking and management platform designe
 ### Backend
 - **Java**
 - **Spring Boot**
-- **Spring Security** (Authentication & Authorization)
+- **Spring Security**
 - **RESTful APIs**
 - **JPA / Hibernate**
-- **MySQL / PostgreSQL** (can be configured)
+- **MySQL / PostgreSQL**
 
 ### Frontend
 - **React.js**
@@ -40,4 +50,8 @@ StaySphere is a full-stack accommodation booking and management platform designe
 - Maven
 - Git & GitHub
 - Postman (API testing)
+
+---
+
+## 📂 Project Structure
 
