@@ -19,10 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +37,7 @@ public class HotelService {
     private final MongoTemplate mongoTemplate;
     private final UserLoginRepository userLoginRepository;
     private final UserRepository userRepository;
-    private final RedisService redisService ;
-
+    private final RedisService redisService;
 
     private UUID extractUserId(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
@@ -49,7 +46,6 @@ public class HotelService {
         return UUID.fromString(claims.get("userID").toString());
     }
 
-
     public Hotels registerHotel(String authHeader, HotelCreateRequest hotelRequest) {
 
         UUID ownerId = UUID.fromString(hotelRequest.getHotelOwnerId());
@@ -57,17 +53,14 @@ public class HotelService {
         HotelOwner owner = hotelOwnerRepository.findById(ownerId)
                 .orElseThrow(() -> new RuntimeException("Hotel Owner not found"));
 
-
-        boolean allVerified =
-                owner.isPanVerified() &&
-                        owner.isAadharVerified() &&
-                        owner.isGstVerified() &&
-                        owner.isHotellicenceVerified();
+        boolean allVerified = owner.isPanVerified() &&
+                owner.isAadharVerified() &&
+                owner.isGstVerified() &&
+                owner.isHotellicenceVerified();
 
         if (!allVerified) {
             throw new RuntimeException("Hotel registration denied. Documents not verified.");
         }
-
 
         Hotels hotel = Hotels.builder()
                 .name(hotelRequest.getName())
@@ -82,9 +75,9 @@ public class HotelService {
                 .phone(hotelRequest.getPhone())
                 .email(hotelRequest.getEmail())
                 .amenities(hotelRequest.getAmenities())
-                .ownerId(owner.getHotelOwnerId().toString())   // set by backend, NOT from DTO
-                .images(List.of())                              // empty list initially
-                .videos(List.of())                              // empty list initially
+                .ownerId(owner.getHotelOwnerId().toString()) // set by backend, NOT from DTO
+                .images(List.of()) // empty list initially
+                .videos(List.of()) // empty list initially
                 .build();
 
         return hotelRepository.save(hotel);
@@ -98,20 +91,19 @@ public class HotelService {
             Integer maxStars,
             List<String> amenities,
             int page,
-            int size
-    ) {
+            int size) {
         Query query = new Query();
 
         if (city != null && !city.isEmpty()) {
-            query.addCriteria(Criteria.where("city").is(city));
+            query.addCriteria(Criteria.where("city").regex(city, "i"));
         }
 
         if (state != null && !state.isEmpty()) {
-            query.addCriteria(Criteria.where("state").is(state));
+            query.addCriteria(Criteria.where("state").regex(state, "i"));
         }
 
         if (country != null && !country.isEmpty()) {
-            query.addCriteria(Criteria.where("country").is(country));
+            query.addCriteria(Criteria.where("country").regex(country, "i"));
         }
 
         if (minStars != null || maxStars != null) {
@@ -130,17 +122,16 @@ public class HotelService {
         return mongoTemplate.find(query, Hotels.class);
     }
 
-
     @Transactional
-    public ResponseEntity<Map<String,Object>>  getHotelOwnerIds(String authHeader) {
+    public ResponseEntity<Map<String, Object>> getHotelOwnerIds(String authHeader) {
         UUID userId = extractUserId(authHeader);
         HotelOwner owner = hotelOwnerRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Hotel Owner not found"));
 
         String token = authHeader.replace("Bearer ", "");
 
-        UserLogin userLogin = userLoginRepository.findByJwtToken(token).
-                orElseThrow(() -> new RuntimeException("Jwt token  not found"));
+        UserLogin userLogin = userLoginRepository.findByJwtToken(token)
+                .orElseThrow(() -> new RuntimeException("Jwt token  not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         user.setRole(UserRole.HOTEL_ADMIN);
         userRepository.save(user);
@@ -159,12 +150,11 @@ public class HotelService {
                 user.getCity(),
                 user.getGender(),
                 UserRole.HOTEL_ADMIN,
-                user.getId()
-        );
+                user.getId());
         redisService.delete(token); // delete old token
         redisService.save(jwtToken, String.valueOf(user.getId()), jwtUtil.getTokenValidity()); // register new token
 
-        String refreshToken =jwtUtil.generateRefreshToken(user.getEmail(),user.getId(),UserRole.HOTEL_ADMIN);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getId(), UserRole.HOTEL_ADMIN);
         userLogin.setJwtToken(jwtToken);
         userLogin.setRefreshToken(refreshToken);
         userLoginRepository.save(userLogin);
@@ -174,8 +164,7 @@ public class HotelService {
         response.put("refreshToken", refreshToken);
 
         response.put("message",
-                "Your hotel owner key has been generated. Keep this ID safe, you will need it to access your hotel dashboard."
-        );
+                "Your hotel owner key has been generated. Keep this ID safe, you will need it to access your hotel dashboard.");
 
         return ResponseEntity.ok(response);
 

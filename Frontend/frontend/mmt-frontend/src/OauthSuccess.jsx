@@ -1,4 +1,3 @@
-//
 
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,18 +16,18 @@ export default function OauthSuccess() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-
     const accessToken = params.get("accessToken");
     const refreshToken = params.get("refreshToken");
-
-    if (!accessToken) {
-      navigate("/");
-      return;
-    }
+    const pictureUrl = params.get("pictureUrl");
 
     // Save tokens
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
+    if (pictureUrl) {
+      localStorage.setItem("profilePic", pictureUrl);
+    } else {
+      console.warn("No pictureUrl found in URL parameters!");
+    }
 
     // Decode and store user details from JWT
     const decoded = parseJwt(accessToken);

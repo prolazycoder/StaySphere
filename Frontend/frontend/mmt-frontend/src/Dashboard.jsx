@@ -1,6 +1,7 @@
 // src/Dashboard.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logoutUser } from "./utils/authUtils";
 import "./dashboard.css";
 
 const navLinks = ["Home", "Bookings", "Support"];
@@ -145,9 +146,8 @@ function Dashboard() {
             {navLinks.map((link) => (
               <button
                 key={link}
-                className={`topbar-link ${
-                  link === "Home" ? "topbar-link-active" : ""
-                }`}
+                className={`topbar-link ${link === "Home" ? "topbar-link-active" : ""
+                  }`}
                 onClick={() => handleNavClick(link)}
               >
                 {link}
@@ -156,14 +156,37 @@ function Dashboard() {
           </nav>
 
           <div className="topbar-right">
-            <div className="user-info">
-              <div className="user-avatar">J</div>
+            <div
+              className="user-info"
+              onClick={() => navigate("/profile")}
+              style={{ cursor: "pointer" }}
+            >
+              <div className="user-avatar">
+                {localStorage.getItem("profilePic") ? (
+                  <img
+                    src={localStorage.getItem("profilePic")}
+                    alt="Profile"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+                  />
+                ) : (
+                  (localStorage.getItem("fullName") || "U").charAt(0).toUpperCase()
+                )}
+              </div>
               <div>
-                <p className="user-name">John Smith</p>
-                <p className="user-subtitle">Gold Member</p>
+                <p className="user-name">{localStorage.getItem("fullName") || "User"}</p>
+                <p className="user-subtitle">
+                  {localStorage.getItem("role") || "Member"}
+                </p>
               </div>
             </div>
-            <button className="topbar-btn ghost">Logout</button>
+            <button
+              className="topbar-btn ghost"
+              onClick={() => {
+                logoutUser();
+              }}
+            >
+              Logout
+            </button>
             <button className="topbar-btn primary">Register</button>
           </div>
         </header>
@@ -181,17 +204,15 @@ function Dashboard() {
                 </p>
                 <div className="booking-toggle">
                   <button
-                    className={`toggle-pill ${
-                      activeService === "Hotels" ? "active" : ""
-                    }`}
+                    className={`toggle-pill ${activeService === "Hotels" ? "active" : ""
+                      }`}
                     onClick={() => setActiveService("Hotels")}
                   >
                     Hotels
                   </button>
                   <button
-                    className={`toggle-pill ${
-                      activeService === "Cabs" ? "active" : ""
-                    }`}
+                    className={`toggle-pill ${activeService === "Cabs" ? "active" : ""
+                      }`}
                     onClick={() => setActiveService("Cabs")}
                   >
                     Cabs
@@ -264,7 +285,8 @@ function Dashboard() {
                     </div>
                   )}
 
-                  <div className="form-field form-field-button">
+                  <div className="form-field">
+                    <label>&nbsp;</label>
                     <button className="search-btn" onClick={handleSearch}>
                       {activeService === "Hotels"
                         ? "Search Hotels"

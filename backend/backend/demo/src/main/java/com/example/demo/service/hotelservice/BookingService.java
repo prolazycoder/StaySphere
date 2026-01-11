@@ -13,8 +13,14 @@ import com.example.demo.repository.hotel.RoomInventoryRepository;
 import com.example.demo.repository.user.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.payment.PaymentService;
+import com.example.demo.dto.BookingResponseDto;
+import com.example.demo.entity.hotel.Hotels;
+import com.example.demo.repository.hotel.HotelRepository;
+import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;   // 👈 Added
+import lombok.extern.slf4j.Slf4j; // 👈 Added
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,152 +31,212 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j   // 👈 Added
+@Slf4j // 👈 Added
 public class BookingService {
 
-    private final BookingRepository bookingRepository;
-    private final RoomInventoryRepository inventoryRepository;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
-    private final PaymentService paymentService;
+        private final BookingRepository bookingRepository;
+        private final RoomInventoryRepository inventoryRepository;
+        private final UserRepository userRepository;
+        private final JwtUtil jwtUtil;
+        private final PaymentService paymentService;
+        private final HotelRepository hotelRepository;
 
-    @Transactional
-    public Booking createBooking(String authHeader, BookingRequest request) throws Exception {
+        @Transactional
+        public Booking createBooking(String authHeader, BookingRequest request) throws Exception {
 
-        log.info("🔐 Starting booking creation");
-        log.info("📥 Incoming BookingRequest: {}", request);
+                log.info("🔐 Starting booking creation");
+                log.info("📥 Incoming BookingRequest: {}", request);
 
-        String token = authHeader.replace("Bearer ", "");
-        log.debug("Extracted JWT token: {}", token);
+                String token = authHeader.replace("Bearer ", "");
+                log.debug("Extracted JWT token: {}", token);
 
-        UUID userId = UUID.fromString(
-                jwtUtil.extractAllClaims(token).get("userID").toString()
-        );
+                UUID userId = UUID.fromString(
+                                jwtUtil.extractAllClaims(token).get("userID").toString());
 
-        log.info("👤 User ID extracted from JWT: {}", userId);
+                log.info("👤 User ID extracted from JWT: {}", userId);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.error("❌ User not found: {}", userId);
-                    return new RuntimeException("User not found");
-                });
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> {
+                                        log.error("❌ User not found: {}", userId);
+                                        return new RuntimeException("User not found");
+                                });
 
-        // -----------------------------------------
-        // Validate Dates
-        // -----------------------------------------
-        LocalDate today = LocalDate.now();
-        log.debug("📅 Today: {}", today);
+                // -----------------------------------------
+                // Validate Dates
+                // -----------------------------------------
+                LocalDate today = LocalDate.now();
+                log.debug("📅 Today: {}", today);
 
-        if (request.getCheckIn().isBefore(today)) {
-            log.error("❌ Invalid check-in date: {}", request.getCheckIn());
-            throw new RuntimeException("Check-in date cannot be in the past");
+                if (request.getCheckIn().isBefore(today)) {
+                        log.error("❌ Invalid check-in date: {}", request.getCheckIn());
+                        throw new RuntimeException("Check-in date cannot be in the past");
+                }
+
+                if (!request.getCheckOut().isAfter(request.getCheckIn())) {
+                        log.error("❌ Invalid date range. CheckIn: {} CheckOut: {}",
+                                        request.getCheckIn(), request.getCheckOut());
+                        throw new RuntimeException("Invalid date range");
+                }
+
+                // -----------------------------------------
+                // Lock Inventory
+                // -----------------------------------------
+                log.info("🔒 Locking inventory for hotelId={} roomType={} from {} to {}",
+                                request.getHotelId(), request.getRoomType(),
+                                request.getCheckIn(), request.getCheckOut().minusDays(1));
+
+                List<RoomInventory> inventories = inventoryRepository.lockInventory(
+                                request.getHotelId(),
+                                request.getRoomType(),
+                                request.getCheckIn(),
+                                request.getCheckOut().minusDays(1));
+
+                if (inventories.isEmpty()) {
+                        log.warn("⚠️ Inventory not found for hotelId={} roomType={}. Initializing default inventory...",
+                                        request.getHotelId(), request.getRoomType());
+
+                        List<RoomInventory> newInventories = new java.util.ArrayList<>();
+                        LocalDate current = request.getCheckIn();
+                        while (current.isBefore(request.getCheckOut())) {
+                                RoomInventory newInv = RoomInventory.builder()
+                                                .hotelId(request.getHotelId())
+                                                .roomType(request.getRoomType())
+                                                .date(current)
+                                                .availableCount(10) // Default availability
+                                                .price(2500.0) // Default price
+                                                .build();
+                                newInventories.add(newInv);
+                                current = current.plusDays(1);
+                        }
+                        inventoryRepository.saveAll(newInventories);
+                        log.info("✅ Initialized {} inventory entries.", newInventories.size());
+
+                        // Retry fetching
+                        inventories = inventoryRepository.lockInventory(
+                                        request.getHotelId(),
+                                        request.getRoomType(),
+                                        request.getCheckIn(),
+                                        request.getCheckOut().minusDays(1));
+                }
+
+                log.info("📦 Inventory fetched: {} entries", inventories.size());
+
+                // -----------------------------------------
+                // Check Availability
+                // -----------------------------------------
+                for (RoomInventory inv : inventories) {
+                        log.debug("Inventory on {} = {}", inv.getDate(), inv.getAvailableCount());
+
+                        if (inv.getAvailableCount() < request.getRooms()) {
+                                log.error("❌ Not enough rooms on {}. Required={} Available={}",
+                                                inv.getDate(), request.getRooms(), inv.getAvailableCount());
+                                throw new RuntimeException(
+                                                "Not enough rooms on " + inv.getDate());
+                        }
+                }
+
+                // -----------------------------------------
+                // Deduct Rooms
+                // -----------------------------------------
+                log.info("🛏 Deducting {} rooms for each night", request.getRooms());
+
+                for (RoomInventory inv : inventories) {
+                        int before = inv.getAvailableCount();
+                        inv.setAvailableCount(before - request.getRooms());
+                        log.debug("Updated inventory {} -> {} for date {}",
+                                        before, inv.getAvailableCount(), inv.getDate());
+                }
+
+                inventoryRepository.saveAll(inventories);
+                log.info("💾 Inventory updated successfully");
+
+                // -----------------------------------------
+                // Calculate Pricing
+                // -----------------------------------------
+                long nights = request.getCheckIn().until(request.getCheckOut()).getDays();
+                double pricePerNight = inventories.get(0).getPrice();
+                double totalAmount = pricePerNight * nights * request.getRooms();
+
+                log.info("💰 Pricing: nights={} pricePerNight={} rooms={} total={}",
+                                nights, pricePerNight, request.getRooms(), totalAmount);
+
+                // -----------------------------------------
+                // Create Pending Booking
+                // -----------------------------------------
+                Booking booking = Booking.builder()
+                                .checkIn(request.getCheckIn())
+                                .checkOut(request.getCheckOut())
+                                .roomsBooked(request.getRooms())
+                                .pricePerNight(pricePerNight)
+                                .totalAmount(totalAmount)
+                                .hotelId(request.getHotelId())
+                                .roomType(request.getRoomType().name())
+                                .user(user)
+                                .paymentStatus(PaymentStatus.PENDING)
+                                .bookingStatus(BookingStatus.PENDING)
+                                .build();
+
+                booking = bookingRepository.save(booking);
+                log.info("📝 Booking created with ID={}", booking.getId());
+
+                // -----------------------------------------
+                // Create Payment Request
+                // -----------------------------------------
+                PaymentCreateRequestDto paymentRequest = new PaymentCreateRequestDto(
+                                user.getId(),
+                                BigDecimal.valueOf(totalAmount),
+                                "INR",
+                                booking.getId(),
+                                ReferenceType.HOTEL_BOOKING);
+
+                log.info("💳 Creating payment for booking {}", booking.getId());
+                paymentService.createPayment(paymentRequest);
+
+                log.info("✅ Booking process completed successfully for bookingId={}", booking.getId());
+
+                return booking;
         }
 
-        if (!request.getCheckOut().isAfter(request.getCheckIn())) {
-            log.error("❌ Invalid date range. CheckIn: {} CheckOut: {}",
-                    request.getCheckIn(), request.getCheckOut());
-            throw new RuntimeException("Invalid date range");
+        public List<BookingResponseDto> getBookingsForUser(String authHeader) {
+                String token = authHeader.replace("Bearer ", "");
+                UUID userId = UUID.fromString(jwtUtil.extractAllClaims(token).get("userID").toString());
+
+                List<Booking> bookings = bookingRepository.findByUserId(userId);
+
+                // Extract hotel IDs
+                List<String> hotelIds = bookings.stream()
+                                .map(Booking::getHotelId)
+                                .distinct()
+                                .collect(Collectors.toList());
+
+                // Fetch hotels
+                List<Hotels> hotels = hotelRepository.findAllById(hotelIds);
+                Map<String, Hotels> hotelMap = hotels.stream()
+                                .collect(Collectors.toMap(Hotels::getId, Function.identity()));
+
+                return bookings.stream().map(booking -> {
+                        Hotels hotel = hotelMap.get(booking.getHotelId());
+                        String hotelName = (hotel != null) ? hotel.getName() : "Unknown Hotel";
+                        String hotelImage = (hotel != null && hotel.getImages() != null && !hotel.getImages().isEmpty())
+                                        ? hotel.getImages().get(0)
+                                        : null;
+                        String location = (hotel != null) ? hotel.getCity() + ", " + hotel.getCountry() : "";
+
+                        return BookingResponseDto.builder()
+                                        .id(booking.getId())
+                                        .hotelId(booking.getHotelId())
+                                        .hotelName(hotelName)
+                                        .hotelLocation(location)
+                                        .hotelImage(hotelImage)
+                                        .roomType(booking.getRoomType())
+                                        .checkIn(booking.getCheckIn())
+                                        .checkOut(booking.getCheckOut())
+                                        .roomsBooked(booking.getRoomsBooked())
+                                        .totalAmount(booking.getTotalAmount())
+                                        .bookingStatus(booking.getBookingStatus())
+                                        .paymentStatus(booking.getPaymentStatus())
+                                        .build();
+                }).collect(Collectors.toList());
         }
 
-        // -----------------------------------------
-        // Lock Inventory
-        // -----------------------------------------
-        log.info("🔒 Locking inventory for hotelId={} roomType={} from {} to {}",
-                request.getHotelId(), request.getRoomType(),
-                request.getCheckIn(), request.getCheckOut().minusDays(1));
-
-        List<RoomInventory> inventories =
-                inventoryRepository.lockInventory(
-                        request.getHotelId(),
-                        request.getRoomType(),
-                        request.getCheckIn(),
-                        request.getCheckOut().minusDays(1)
-                );
-
-        if (inventories.isEmpty()) {
-            log.error("❌ No inventory initialized for hotelId={} roomType={}",
-                    request.getHotelId(), request.getRoomType());
-            throw new RuntimeException("Inventory not initialized");
-        }
-
-        log.info("📦 Inventory fetched: {} entries", inventories.size());
-
-        // -----------------------------------------
-        // Check Availability
-        // -----------------------------------------
-        for (RoomInventory inv : inventories) {
-            log.debug("Inventory on {} = {}", inv.getDate(), inv.getAvailableCount());
-
-            if (inv.getAvailableCount() < request.getRooms()) {
-                log.error("❌ Not enough rooms on {}. Required={} Available={}",
-                        inv.getDate(), request.getRooms(), inv.getAvailableCount());
-                throw new RuntimeException(
-                        "Not enough rooms on " + inv.getDate()
-                );
-            }
-        }
-
-        // -----------------------------------------
-        // Deduct Rooms
-        // -----------------------------------------
-        log.info("🛏 Deducting {} rooms for each night", request.getRooms());
-
-        for (RoomInventory inv : inventories) {
-            int before = inv.getAvailableCount();
-            inv.setAvailableCount(before - request.getRooms());
-            log.debug("Updated inventory {} -> {} for date {}",
-                    before, inv.getAvailableCount(), inv.getDate());
-        }
-
-        inventoryRepository.saveAll(inventories);
-        log.info("💾 Inventory updated successfully");
-
-        // -----------------------------------------
-        // Calculate Pricing
-        // -----------------------------------------
-        long nights = request.getCheckIn().until(request.getCheckOut()).getDays();
-        double pricePerNight = inventories.get(0).getPrice();
-        double totalAmount = pricePerNight * nights * request.getRooms();
-
-        log.info("💰 Pricing: nights={} pricePerNight={} rooms={} total={}",
-                nights, pricePerNight, request.getRooms(), totalAmount);
-
-        // -----------------------------------------
-        // Create Pending Booking
-        // -----------------------------------------
-        Booking booking = Booking.builder()
-                .checkIn(request.getCheckIn())
-                .checkOut(request.getCheckOut())
-                .roomsBooked(request.getRooms())
-                .pricePerNight(pricePerNight)
-                .totalAmount(totalAmount)
-                .hotelId(request.getHotelId())
-                .roomType(request.getRoomType().name())
-                .user(user)
-                .paymentStatus(PaymentStatus.PENDING)
-                .bookingStatus(BookingStatus.PENDING)
-                .build();
-
-        booking = bookingRepository.save(booking);
-        log.info("📝 Booking created with ID={}", booking.getId());
-
-        // -----------------------------------------
-        // Create Payment Request
-        // -----------------------------------------
-        PaymentCreateRequestDto paymentRequest =
-                new PaymentCreateRequestDto(
-                        user.getId(),
-                        BigDecimal.valueOf(totalAmount),
-                        "INR",
-                        booking.getId(),
-                        ReferenceType.HOTEL_BOOKING
-                );
-
-        log.info("💳 Creating payment for booking {}", booking.getId());
-        paymentService.createPayment(paymentRequest);
-
-        log.info("✅ Booking process completed successfully for bookingId={}", booking.getId());
-
-        return booking;
-    }
 }

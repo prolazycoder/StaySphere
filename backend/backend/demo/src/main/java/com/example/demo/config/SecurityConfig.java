@@ -42,14 +42,16 @@ public class SecurityConfig {
                             "/public/**",
                             "/swagger-ui/**",
                             "/v3/api-docs/**",
-                            "/oauth2/**","/auth/phone/**",
+                            "/oauth2/**", "/auth/phone/**",
                             "/auth/otp/**",
                             "/oauth2callback",
-                            "/test"
+                            "/test",
+                            "/api/v1/hotels/search"
 
-                    ).permitAll()
+                ).permitAll()
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                          .requestMatchers("/admin/**").hasAuthority("SYS_ADMIN")
+                            .requestMatchers("/admin/**").hasAuthority("SYS_ADMIN")
 
                             .requestMatchers("/hotel-admin/**").hasAuthority("HOTEL_ADMIN");
 

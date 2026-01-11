@@ -36,12 +36,18 @@ const parseJwt = (token) => {
 // ================== LOCAL TOKEN CHECK ==================
 const isAuthenticated = () => {
   const token = localStorage.getItem("accessToken");
+  console.log("App: isAuthenticated check. Token:", token ? "Present" : "Missing");
   if (!token) return false;
 
   const decoded = parseJwt(token);
-  if (!decoded || !decoded.exp) return false;
+  if (!decoded || !decoded.exp) {
+    console.log("App: Invalid or expired token structure");
+    return false;
+  }
 
-  return decoded.exp * 1000 > Date.now();
+  const isValid = decoded.exp * 1000 > Date.now();
+  console.log("App: Token valid?", isValid);
+  return isValid;
 };
 
 // ================== PROTECTED ROUTE ==================
@@ -58,7 +64,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        
+
         {/* LOGIN PAGE */}
         <Route
           path="/"

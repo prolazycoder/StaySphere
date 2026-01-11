@@ -1,6 +1,5 @@
 package com.example.demo.service.userservice;
 
-
 import com.example.demo.dto.UserResponseDto;
 import com.example.demo.dto.UserUpdateDTO;
 import com.example.demo.entity.hotel.HotelOwner;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import jakarta.persistence.criteria.Predicate;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,7 +33,6 @@ public class UserService {
     private final UserLoginRepository userLoginRepository;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-
 
     private UserResponseDto convertToDto(User user) {
         UserResponseDto dto = new UserResponseDto();
@@ -50,13 +47,11 @@ public class UserService {
         return dto;
     }
 
-
     private UUID extractUserId(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Claims claims = jwtUtil.extractAllClaims(token);
         return UUID.fromString(claims.get("userID").toString());
     }
-
 
     public void initializeHotelOwner(String authHeader) {
 
@@ -80,8 +75,6 @@ public class UserService {
 
         hotelOwnerRepository.save(newOwner);
     }
-
-
 
     // 🔹 Logout (Invalidate Access Token)
     public Map<String, Object> logout(String jwtToken) {
@@ -114,7 +107,8 @@ public class UserService {
 
     // Utility function — truncate token for logging
     private String truncateToken(String token) {
-        if (token == null || token.length() < 15) return token;
+        if (token == null || token.length() < 15)
+            return token;
         return token.substring(0, 12) + "...";
     }
 
@@ -136,14 +130,19 @@ public class UserService {
         log.info("Updating info for user {}", userId);
         User user = userRepository.findById(userId).orElseThrow();
 
-        if (dto.getFullName() != null) user.setFullName(dto.getFullName());
-        if (dto.getCountry() != null) user.setCountry(dto.getCountry());
-        if (dto.getCity() != null) user.setCity(dto.getCity());
-        if (dto.getDob() != null) user.setDob(dto.getDob());
-        if (dto.getGender() != null) user.setGender(dto.getGender());
-        if(dto.getPhoneNumber() != null) user.setPhoneNumber(dto.getPhoneNumber());
-        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail()))
-        {
+        if (dto.getFullName() != null)
+            user.setFullName(dto.getFullName());
+        if (dto.getCountry() != null)
+            user.setCountry(dto.getCountry());
+        if (dto.getCity() != null)
+            user.setCity(dto.getCity());
+        if (dto.getDob() != null)
+            user.setDob(dto.getDob());
+        if (dto.getGender() != null)
+            user.setGender(dto.getGender());
+        if (dto.getPhoneNumber() != null)
+            user.setPhoneNumber(dto.getPhoneNumber());
+        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
 
             // check if this email already belongs to another user
             if (userRepository.existsByEmail(dto.getEmail())) {
@@ -156,7 +155,6 @@ public class UserService {
             user.setEmail(dto.getEmail());
         }
 
-
         userRepository.save(user);
 
         log.info("User info updated for user {}", userId);
@@ -166,8 +164,8 @@ public class UserService {
         return response;
     }
 
-    public  void deleteUser(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(()->new EntityNotFoundException("User not found"));
+    public void deleteUser(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
         user.setIsActive(false);
     }
 
@@ -210,6 +208,13 @@ public class UserService {
         return users.map(this::convertToDto);
     }
 
-
+    public UserResponseDto getCurrentUser(String jwtToken) {
+        Object userIdObj = redisService.get(jwtToken);
+        if (userIdObj == null) {
+            throw new RuntimeException("Token is invalid or expired.");
+        }
+        UUID userId = UUID.fromString(userIdObj.toString());
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return convertToDto(user);
+    }
 }
-

@@ -7,13 +7,15 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "room_inventory")
+@Table(name = "room_inventory_v2")
 @Data
-@Builder @AllArgsConstructor @NoArgsConstructor
-public class RoomInventory  {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class RoomInventory {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
     @Enumerated(EnumType.STRING)
@@ -21,7 +23,6 @@ public class RoomInventory  {
     private RoomType roomType;
     private int availableCount;
     private double price;
-
 
     @Column(name = "hotel_id", nullable = false)
     private String hotelId;

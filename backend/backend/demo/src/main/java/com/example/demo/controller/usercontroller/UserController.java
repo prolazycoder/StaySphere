@@ -23,14 +23,13 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @GetMapping("/admin/get/user")
-    public ResponseEntity<Map<String,Object>> getUser(
+    public ResponseEntity<Map<String, Object>> getUser(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) UserRole role,
             @RequestParam(required = false) Gender gender,
             @RequestParam(required = false) String city,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
 
         Page<UserResponseDto> users = userService.getUsers(username, role, gender, city, page, size);
 
@@ -43,8 +42,6 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
-
-
 
     @PutMapping("/user/update")
     public ResponseEntity<Map<String, Object>> updateUser(
@@ -61,7 +58,6 @@ public class UserController {
 
         return ResponseEntity.ok(result);
     }
-
 
     @PostMapping("/user/logout")
     public ResponseEntity<Map<String, Object>> logout(
@@ -83,14 +79,6 @@ public class UserController {
         return ResponseEntity.ok(logoutResponse);
     }
 
-//    @PostMapping("/init")
-//    public ResponseEntity<Void> initHotelOwner(
-//            @RequestHeader("Authorization") String authHeader
-//    ) {
-//        userService.initializeHotelOwner(authHeader);
-//        return ResponseEntity.ok().build();  // No response body
-//    }
-
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @DeleteMapping("/admin/delete/user/{id}")
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable UUID id) {
@@ -99,6 +87,22 @@ public class UserController {
         response.put("success", true);
         response.put("message", "User deleted successfully");
         return ResponseEntity.status(204).body(response);
+    }
+
+    @GetMapping("/user/get/current-user")
+    public ResponseEntity<Map<String, Object>> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            UserResponseDto userDto = userService.getCurrentUser(token);
+            response.put("success", true);
+            response.put("data", userDto);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(401).body(response);
+        }
     }
 
 }

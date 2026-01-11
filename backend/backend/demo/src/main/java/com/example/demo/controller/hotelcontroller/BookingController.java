@@ -14,24 +14,26 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BookingController {
 
-    private final BookingService bookingService;
+        private final BookingService bookingService;
 
-    @PostMapping("/book")
-    public ResponseEntity<?> bookHotel(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestBody BookingRequest request
-    ) throws Exception {
+        @PostMapping("/book")
+        public ResponseEntity<?> bookHotel(
+                        @RequestHeader("Authorization") String authHeader,
+                        @RequestBody BookingRequest request) throws Exception {
 
-        Booking booking = bookingService.createBooking(authHeader, request);
+                Booking booking = bookingService.createBooking(authHeader, request);
 
-        return ResponseEntity.ok(
-                Map.of(
-                        "message", "Booking created successfully",
-                        "bookingId", booking.getId(),
-                        "status", booking.getBookingStatus(),
-                        "amount", booking.getTotalAmount()
-                )
-        );
-    }
+                return ResponseEntity.ok(
+                                Map.of(
+                                                "message", "Booking created successfully",
+                                                "bookingId", booking.getId(),
+                                                "status", booking.getBookingStatus(),
+                                                "amount", booking.getTotalAmount()));
+        }
+
+        @GetMapping("/my-bookings")
+        public ResponseEntity<java.util.List<com.example.demo.dto.BookingResponseDto>> getMyBookings(
+                        @RequestHeader("Authorization") String authHeader) {
+                return ResponseEntity.ok(bookingService.getBookingsForUser(authHeader));
+        }
 }
-
