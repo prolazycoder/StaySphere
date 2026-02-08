@@ -45,7 +45,8 @@ public class Ride {
     private double dropLatitude;
     private double dropLongitude;
 
-    private Boolean OtpVerified = Boolean.FALSE ;
+    @Builder.Default
+    private Boolean otpVerified = Boolean.FALSE;
     @Enumerated(EnumType.STRING)
     private RideStatus status;
 

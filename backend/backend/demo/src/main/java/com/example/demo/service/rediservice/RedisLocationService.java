@@ -33,8 +33,7 @@ public class RedisLocationService {
         redis.opsForGeo().add(
                 DRIVER_GEO,
                 new Point(lng, lat),
-                driverId.toString()
-        );
+                driverId.toString());
         redis.opsForValue().set(DRIVER_LOC + driverId, lat + "," + lng);
     }
 
@@ -42,9 +41,9 @@ public class RedisLocationService {
 
         GeoResults<RedisGeoCommands.GeoLocation<String>> results =
                 redis.opsForGeo().radius(
-                        DRIVER_GEO,
-                        new Circle(
-                                new Point(lng, lat),
+                DRIVER_GEO,
+                new Circle(
+                        new Point(lng, lat),
                                 new Distance(radiusMeters, RedisGeoCommands.DistanceUnit.METERS)
                         )
                 );

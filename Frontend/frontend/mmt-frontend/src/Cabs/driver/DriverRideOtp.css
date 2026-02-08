@@ -1,0 +1,51 @@
+.otpWrap {
+    padding: 20px;
+}
+
+.otpTitle {
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.otpCard {
+    margin-top: 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+    display: grid;
+    gap: 10px;
+}
+
+.otpCard label {
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.otpCard input {
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+}
+
+.btnDark {
+    margin-top: 6px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #111827;
+    font-weight: 900;
+    color: white;
+    cursor: pointer;
+}
+
+.btnGreen {
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #16a34a;
+    font-weight: 900;
+    color: white;
+    cursor: pointer;
+}

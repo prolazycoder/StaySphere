@@ -77,10 +77,8 @@ public class JwtUtil {
                 .compact();
     }
 
-
-
     // ------------------- Refresh Token -------------------
-    public String generateRefreshToken(String emailOrPhone ,UUID id ,   UserRole role ) {
+    public String generateRefreshToken(String emailOrPhone, UUID id, UserRole role) {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", emailOrPhone);
@@ -116,7 +114,6 @@ public class JwtUtil {
         return isTokenValid(refreshToken);
     }
 
-
     public String createNewAccessToken(String refreshToken, String role) {
         Claims claims = extractAllClaims(refreshToken);
 
@@ -134,21 +131,26 @@ public class JwtUtil {
     }
 
     public long getTokenValidity() {
-        return  REFRESH_TOKEN_VALIDITY;
+        return REFRESH_TOKEN_VALIDITY;
     }
 
     public boolean isRefreshTokenValidFromDB(String token) {
         return isRefreshTokenValid(token) && userLoginRepository.findByRefreshToken(token).isPresent();
     }
+
     public boolean isAccessTokenValidFromRedis(String token) {
         return isTokenValid(token) && redisService.get(token) != null;
     }
 
-    public  UUID extractUserId(String authHeader) {
+    public UUID extractUserId(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Claims claims = extractAllClaims(token);
-        return UUID.fromString(claims.get("userId").toString());
+        // Fix: Use "userID" to match generateToken key
+        Object userIdObj = claims.get("userID");
+        if (userIdObj == null) {
+            throw new IllegalArgumentException("Token missing userID claim");
+        }
+        return UUID.fromString(userIdObj.toString());
     }
-
 
 }

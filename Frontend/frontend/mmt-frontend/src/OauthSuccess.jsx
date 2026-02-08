@@ -36,7 +36,7 @@ export default function OauthSuccess() {
       localStorage.setItem("fullName", decoded.name || "");
       localStorage.setItem("email", decoded.sub || "");
       localStorage.setItem("role", decoded.role || "");
-      localStorage.setItem("userID", decoded.userID || "");
+      localStorage.setItem("userId", decoded.userID || "");
       localStorage.setItem("gender", decoded.gender || "");
       localStorage.setItem("country", decoded.country || "");
       localStorage.setItem("city", decoded.city || "");

@@ -1,9 +1,7 @@
 package com.example.demo.service.cabservice;
 
 import com.example.demo.dto.socket.SearchDriverReq;
-import com.example.demo.entity.cab.Driver;
 import com.example.demo.entity.cab.Ride;
-import com.example.demo.entity.cab.Vehicle;
 import com.example.demo.enums.cab.RideStatus;
 import com.example.demo.repository.cab.DriverRepository;
 import com.example.demo.repository.cab.RideRepository;
@@ -13,7 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import com.example.demo.exception.DriverNotFoundException;
+
 import java.util.*;
 
 @Service
@@ -24,7 +23,7 @@ public class RiderService {
     private final RideRepository rideRepo;
     private final DriverRepository driverRepo;
     private final SimpMessagingTemplate messaging;
-    private final JwtUtil jwtUtil ;
+    private final JwtUtil jwtUtil;
 
     // =======================================================
     // 1) RIDER SEARCHES FOR NEARBY DRIVERS
@@ -35,14 +34,16 @@ public class RiderService {
         UUID riderId = jwtUtil.extractUserId(token);
 
         // 2. Find nearby drivers
+        System.out.println("DEBUG: Searching for drivers at " + req.getPickupLat() + ", " + req.getPickupLng());
         List<String> driverIds = redis.findNearbyDrivers(
                 req.getPickupLat(),
                 req.getPickupLng(),
-                3000
-        );
+                5000); // Increased radius to 5km for easier testing
+
+        System.out.println("DEBUG: Found drivers: " + driverIds);
 
         if (driverIds.isEmpty()) {
-            throw new RuntimeException("No drivers available nearby");
+            throw new DriverNotFoundException("No drivers available nearby");
         }
 
         // 3. Create ride
@@ -70,15 +71,11 @@ public class RiderService {
                             "pickupLat", req.getPickupLat(),
                             "pickupLng", req.getPickupLng(),
                             "dropLat", req.getDropLat(),
-                            "dropLng", req.getDropLng()
-                    )
-            );
+                            "dropLng", req.getDropLng()));
         }
 
         return savedRide;
     }
-
-
 
     // =======================================================
     // 2) RIDER CANCELS RIDE BEFORE DRIVER ACCEPTS
@@ -98,9 +95,7 @@ public class RiderService {
         // Notify corresponding drivers/rider
         messaging.convertAndSend(
                 "/topic/ride/" + rideId,
-                Map.of("event", "RIDE_CANCELLED")
-        );
+                Map.of("event", "RIDE_CANCELLED"));
     }
-
 
 }

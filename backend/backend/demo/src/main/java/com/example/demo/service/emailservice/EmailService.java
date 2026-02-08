@@ -26,7 +26,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final OtpService otpService;
     private final RedisService redisService;
-    private final JwtUtil   jwtUtil;
+    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final UserLoginRepository userLoginRepository;
     private final HotelOwnerRepository hotelRepository;
@@ -35,8 +35,8 @@ public class EmailService {
     private static final String OTP_COOLDOWN_PREFIX = "EMAIL_COOLDOWN";
 
     public EmailService(JavaMailSender mailSender, OtpService otpService,
-                        RedisService redisService,JwtUtil jwtUtil,UserRepository userRepository,
-                        UserLoginRepository userLoginRepository,HotelOwnerRepository hotelRepository) {
+            RedisService redisService, JwtUtil jwtUtil, UserRepository userRepository,
+            UserLoginRepository userLoginRepository, HotelOwnerRepository hotelRepository) {
         this.mailSender = mailSender;
         this.otpService = otpService;
         this.redisService = redisService;
@@ -46,7 +46,6 @@ public class EmailService {
         this.hotelRepository = hotelRepository;
 
     }
-
 
     public String sendOtp(String email) {
         String cooldownKey = OTP_COOLDOWN_PREFIX + "_" + email;
@@ -61,6 +60,7 @@ public class EmailService {
 
         // Send OTP via email
         sendEmail(email, otp);
+        System.out.println("DEBUG OTP for " + email + ": " + otp);
 
         // Set cooldown in Redis
         redisService.save(cooldownKey, "WAIT", OTP_COOLDOWN_MINUTES);
@@ -68,15 +68,13 @@ public class EmailService {
         return otp;
     }
 
-
-    public  void sendEmail(String toEmail, String otp) {
+    public void sendEmail(String toEmail, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Your OTP Code");
         message.setText("Your OTP is: " + otp + "\nIt will expire in 5 minutes.");
         mailSender.send(message);
     }
-
 
     public boolean validateOtp(String email, String otp) {
         return otpService.validateOtp("EMAIL", email, otp);
@@ -95,16 +93,16 @@ public class EmailService {
         return response;
     }
 
-    public Map<String,Object> registerUser(String email) {
+    public Map<String, Object> registerUser(String email) {
 
         String name = (email.split("@")[0]);
 
         User user = userRepository.findByEmail(email).orElseGet(() -> {
-            //log.info("Creating new user for email: {}", email);
+            // log.info("Creating new user for email: {}", email);
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setFullName(name);
-            //newUser.setAuthProvider(AuthProvider.GOOGLE);
+            // newUser.setAuthProvider(AuthProvider.GOOGLE);
             newUser.setRole(UserRole.USER);
             newUser.setIsActive(true);
 
@@ -119,7 +117,7 @@ public class EmailService {
 
         User savedUser = userRepository.save(user);
 
-        //log.info("Generating JWT token for user: {}", user.getEmail());
+        // log.info("Generating JWT token for user: {}", user.getEmail());
         String jwtToken = jwtUtil.generateToken(
                 email,
                 user.getAuthProvider(),
@@ -132,7 +130,7 @@ public class EmailService {
 
         );
         redisService.save(jwtToken, String.valueOf(user.getId()), jwtUtil.getTokenValidity());
-        String refreshToken =jwtUtil.generateRefreshToken(email,user.getId(),user.getRole());
+        String refreshToken = jwtUtil.generateRefreshToken(email, user.getId(), user.getRole());
 
         UserLogin userLogin = userLoginRepository.findByUserId(user.getId())
                 .orElse(new UserLogin());
@@ -140,12 +138,11 @@ public class EmailService {
         userLogin.setJwtToken(jwtToken);
         userLogin.setRefreshToken(refreshToken);
         userLogin.setRefreshTokenExpiry(
-                LocalDateTime.now().plusNanos(jwtUtil.getTokenValidity() * 1_000_000)
-        );
+                LocalDateTime.now().plusNanos(jwtUtil.getTokenValidity() * 1_000_000));
 
         userLoginRepository.save(userLogin);
 
-       // log.info("User login saved for user: {}", user.getEmail());
+        // log.info("User login saved for user: {}", user.getEmail());
 
         Map<String, Object> result = new HashMap<>();
         result.put("jwtToken", jwtToken);
@@ -153,9 +150,9 @@ public class EmailService {
         result.put("email", user.getEmail());
         result.put("fullName", user.getFullName());
         result.put("role", user.getRole().name());
-        result.put("flag",user.getFlag());
+        result.put("flag", user.getFlag());
 
-        //log.info("Returning result map: {}", result);
+        // log.info("Returning result map: {}", result);
         return result;
 
     }
@@ -179,12 +176,18 @@ public class EmailService {
             User user = optionalUser.get(); // Get actual User object
 
             // Update fields from DTO
-            if (dto.getFullName() != null) user.setFullName(dto.getFullName());
-            if (dto.getCountry() != null) user.setCountry(dto.getCountry());
-            if (dto.getCity() != null) user.setCity(dto.getCity());
-            if (dto.getPhoneNumber() != null) user.setPhoneNumber(dto.getPhoneNumber());
-            if (dto.getGender() != null) user.setGender(dto.getGender());
-            if (dto.getDob() != null) user.setDob(dto.getDob());
+            if (dto.getFullName() != null)
+                user.setFullName(dto.getFullName());
+            if (dto.getCountry() != null)
+                user.setCountry(dto.getCountry());
+            if (dto.getCity() != null)
+                user.setCity(dto.getCity());
+            if (dto.getPhoneNumber() != null)
+                user.setPhoneNumber(dto.getPhoneNumber());
+            if (dto.getGender() != null)
+                user.setGender(dto.getGender());
+            if (dto.getDob() != null)
+                user.setDob(dto.getDob());
             if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().equals(user.getPhoneNumber())) {
 
                 // Check if another user has same phone number
@@ -206,7 +209,6 @@ public class EmailService {
         }
     }
 
-
     public String validateTokenAndGetEmail(String authHeader) {
         try {
 
@@ -224,13 +226,12 @@ public class EmailService {
             }
 
             Claims email = jwtUtil.extractAllClaims(token);
-            return email.get("sub",String.class);
+            return email.get("sub", String.class);
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-
 
 }

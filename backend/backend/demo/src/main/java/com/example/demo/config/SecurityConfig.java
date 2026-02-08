@@ -46,17 +46,12 @@ public class SecurityConfig {
                             "/auth/otp/**",
                             "/oauth2callback",
                             "/test",
-                            "/api/v1/hotels/search"
-
-                ).permitAll()
+                            "/api/v1/hotels/search",
+                            "/ws-driver/**").permitAll()
                             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
                             .requestMatchers("/admin/**").hasAuthority("SYS_ADMIN")
-
-                            .requestMatchers("/hotel-admin/**").hasAuthority("HOTEL_ADMIN");
-
-                    log.info("Permitting all requests to public endpoints and /logout");
-                    auth.anyRequest().authenticated();
+                            .requestMatchers("/hotel-admin/**").hasAuthority("HOTEL_ADMIN")
+                            .anyRequest().authenticated();
 
                     log.info("All other requests will require authentication");
                 })

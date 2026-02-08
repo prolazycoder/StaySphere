@@ -1,0 +1,113 @@
+.cabPage {
+    padding: 20px;
+}
+
+.cabTitle {
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 12px;
+}
+
+.cabCard {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 16px;
+    border-radius: 14px;
+    margin-top: 14px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+}
+
+.cabGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.cabField label {
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.cabField input {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+}
+
+.cabActions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+}
+
+.btnPrimary {
+    border: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.btnDanger {
+    border: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: #dc2626;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.cabStatus {
+    margin-top: 14px;
+}
+
+.badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 6px 10px;
+    background: #f3f4f6;
+    border-radius: 999px;
+    font-weight: 900;
+}
+
+
+.pickupRow {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.pickupRow input {
+    flex: 1;
+}
+
+.btnGps {
+    border: 1px solid #1f2937;
+    background: #111827;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btnGps:hover {
+    opacity: 0.9;
+}
+
+.btnGps:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cabMap {
+    height: 320px;
+    border-radius: 14px;
+    overflow: hidden;
+}

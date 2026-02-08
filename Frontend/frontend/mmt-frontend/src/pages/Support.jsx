@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaHeadset, FaPaperPlane, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
 import "../dashboard.css";
 
 export default function Support() {
@@ -64,60 +66,68 @@ export default function Support() {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="registration-container" style={{ maxWidth: '600px' }}>
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          <FaArrowLeft /> Back
-        </button>
-        <h1 className="page-title">Chat Support</h1>
-        <p className="page-subtitle">We are here to help you 24/7.</p>
+    <div className="app-root">
+      <Sidebar />
+      <div className="main-area">
+        <Topbar />
+        <main className="content">
+          <div className="page-wrapper">
+            <div className="registration-container" style={{ maxWidth: '600px' }}>
+              <button className="back-btn" onClick={() => navigate(-1)}>
+                <FaArrowLeft /> Back
+              </button>
+              <h1 className="page-title">Chat Support</h1>
+              <p className="page-subtitle">We are here to help you 24/7.</p>
 
-        <div className="chat-window">
-          {/* Header */}
-          <div className="chat-header">
-            <div className="agent-avatar">
-              <FaHeadset />
-            </div>
-            <div className="agent-info">
-              <h4>Support Agent</h4>
-              <div className="agent-status">
-                <span className="status-dot"></span> Online
+              <div className="chat-window">
+                {/* Header */}
+                <div className="chat-header">
+                  <div className="agent-avatar">
+                    <FaHeadset />
+                  </div>
+                  <div className="agent-info">
+                    <h4>Support Agent</h4>
+                    <div className="agent-status">
+                      <span className="status-dot"></span> Online
+                    </div>
+                  </div>
+                </div>
+
+                {/* Messages Area */}
+                <div className="chat-messages">
+                  {messages.map((msg) => (
+                    <div key={msg.id} className={`message-bubble ${msg.sender}`}>
+                      {msg.text}
+                      <span className="message-time">{msg.time}</span>
+                    </div>
+                  ))}
+                  {isTyping && (
+                    <div className="typing-indicator">
+                      Agent is typing...
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <form className="chat-input-area" onSubmit={handleSend}>
+                  <div className="chat-input-wrapper">
+                    <input
+                      type="text"
+                      className="chat-input"
+                      placeholder="Type your message..."
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className="send-btn" disabled={!input.trim()}>
+                    <FaPaperPlane />
+                  </button>
+                </form>
               </div>
             </div>
           </div>
-
-          {/* Messages Area */}
-          <div className="chat-messages">
-            {messages.map((msg) => (
-              <div key={msg.id} className={`message-bubble ${msg.sender}`}>
-                {msg.text}
-                <span className="message-time">{msg.time}</span>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="typing-indicator">
-                Agent is typing...
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Area */}
-          <form className="chat-input-area" onSubmit={handleSend}>
-            <div className="chat-input-wrapper">
-              <input
-                type="text"
-                className="chat-input"
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-            </div>
-            <button type="submit" className="send-btn" disabled={!input.trim()}>
-              <FaPaperPlane />
-            </button>
-          </form>
-        </div>
+        </main>
       </div>
     </div>
   );

@@ -12,10 +12,11 @@ import OauthSuccess from "./OauthSuccess";
 
 // Pages
 import Hotels from "./pages/Hotels";
-import Cabs from "./pages/Cabs";
-import Profile from "./pages/Profile";
+import Cabs from "./cabs/Cabs";
+import RegisterCab from "./cabs/RegisterCab";
 import RegisterHotel from "./pages/RegisterHotel";
-import RegisterCab from "./pages/RegisterCab";
+import Profile from "./pages/Profile";
+import DriverPanel from "./cabs/driver/DriverPanel";
 import BookingPage from "./pages/BookingPage";
 import Support from "./pages/Support";
 import Bookings from "./pages/Bookings";
@@ -132,6 +133,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <RegisterCab />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/driver"
+          element={
+            <ProtectedRoute>
+              <DriverPanel />
             </ProtectedRoute>
           }
         />

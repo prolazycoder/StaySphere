@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "./utils/authUtils";
+import Sidebar from "./components/Sidebar";
+import Topbar from "./components/Topbar";
 import "./dashboard.css";
 
 const navLinks = ["Home", "Bookings", "Support"];
@@ -75,121 +77,12 @@ function Dashboard() {
   return (
     <div className="app-root">
       {/* Left Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <div className="logo-icon">H</div>
-          <div className="logo-text">
-            <span className="logo-title">HotelLink</span>
-            <span className="logo-subtitle">Stay &amp; Ride</span>
-          </div>
-        </div>
-
-        <div className="sidebar-section">
-          <p className="sidebar-section-title">User Dashboard</p>
-
-          <button
-            className="sidebar-link sidebar-link-active"
-            onClick={() => navigate("/")}
-          >
-            <span className="sidebar-dot" />
-            Overview
-          </button>
-
-          <button className="sidebar-link" onClick={() => navigate("/hotels")}>
-            Hotels
-          </button>
-
-          <button className="sidebar-link" onClick={() => navigate("/cabs")}>
-            Cabs
-          </button>
-
-          <button className="sidebar-link" onClick={() => navigate("/profile")}>
-            Profile
-          </button>
-        </div>
-
-        <div className="sidebar-section">
-          <p className="sidebar-section-title">Owner Panel</p>
-
-          <button
-            className="sidebar-cta"
-            onClick={() => navigate("/register-hotel")}
-          >
-            Register Hotel
-          </button>
-
-          <button
-            className="sidebar-cta secondary"
-            onClick={() => navigate("/register-cab")}
-          >
-            Register Cab
-          </button>
-        </div>
-
-        <div className="sidebar-footer">
-          <p className="sidebar-footer-title">Need Help?</p>
-          <p className="sidebar-footer-text">24x7 support available</p>
-          <button
-            className="sidebar-help-btn"
-            onClick={() => navigate("/support")}
-          >
-            Chat with us
-          </button>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <div className="main-area">
         {/* Top Bar */}
-        <header className="topbar">
-          <nav className="topbar-left">
-            {navLinks.map((link) => (
-              <button
-                key={link}
-                className={`topbar-link ${link === "Home" ? "topbar-link-active" : ""
-                  }`}
-                onClick={() => handleNavClick(link)}
-              >
-                {link}
-              </button>
-            ))}
-          </nav>
-
-          <div className="topbar-right">
-            <div
-              className="user-info"
-              onClick={() => navigate("/profile")}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="user-avatar">
-                {localStorage.getItem("profilePic") ? (
-                  <img
-                    src={localStorage.getItem("profilePic")}
-                    alt="Profile"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
-                  />
-                ) : (
-                  (localStorage.getItem("fullName") || "U").charAt(0).toUpperCase()
-                )}
-              </div>
-              <div>
-                <p className="user-name">{localStorage.getItem("fullName") || "User"}</p>
-                <p className="user-subtitle">
-                  {localStorage.getItem("role") || "Member"}
-                </p>
-              </div>
-            </div>
-            <button
-              className="topbar-btn ghost"
-              onClick={() => {
-                logoutUser();
-              }}
-            >
-              Logout
-            </button>
-            <button className="topbar-btn primary">Register</button>
-          </div>
-        </header>
+        <Topbar />
 
         {/* Content */}
         <main className="content">

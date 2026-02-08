@@ -1,0 +1,74 @@
+.reqWrap {
+    padding: 20px;
+}
+
+.reqTitle {
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.reqInfo {
+    margin-top: 8px;
+}
+
+.ok {
+    color: green;
+    font-weight: 900;
+}
+
+.bad {
+    color: red;
+    font-weight: 900;
+}
+
+.reqEmpty {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: white;
+}
+
+.reqGrid {
+    margin-top: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.reqCard {
+    padding: 14px;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+}
+
+.reqLoc {
+    margin-top: 10px;
+    color: #374151;
+    font-weight: 700;
+}
+
+.reqBtns {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.btnGreen,
+.btnRed {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+    color: white;
+}
+
+.btnGreen {
+    background: #16a34a;
+}
+
+.btnRed {
+    background: #dc2626;
+}

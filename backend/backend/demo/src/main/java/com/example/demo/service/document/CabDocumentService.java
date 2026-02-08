@@ -54,11 +54,14 @@ public class CabDocumentService {
                     case PAN_CARD -> driver.setPanVerified(true);
                     case AADHAR_CARD -> driver.setAadharVerified(true);
                     case DRIVING_LICENSE -> driver.setLicenseVerified(true);
+                    case GST_CERTIFICATE -> {
+                    } // No specific field for GST yet, but handle to avoid warning
                 }
-               driverRepository.save(driver);}
-                catch (Exception e) {
-                    e.printStackTrace();
-                }}).start();
+                driverRepository.save(driver);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -66,7 +69,7 @@ public class CabDocumentService {
         response.put("data", doc);
 
         return response;
-}
+    }
 
     public Map<String, Object> getOwnerDocuments(String authHeader) {
 

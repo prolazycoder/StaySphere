@@ -6,7 +6,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 import bgImage from "./assets/Lovely_tavel.login.png";
 
 export default function LoginPage() {
-  const [mode, setMode] = useState(null); 
+  const [mode, setMode] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -70,6 +70,16 @@ export default function LoginPage() {
     setLoading(false);
   };
 
+  // ================== JWT HELPER ==================
+  const parseJwt = (token) => {
+    try {
+      const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(base64));
+    } catch (e) {
+      return null;
+    }
+  };
+
   const verifyEmailOtp = async () => {
     setError("");
     setLoading(true);
@@ -88,6 +98,16 @@ export default function LoginPage() {
       } else {
         localStorage.setItem("accessToken", data.jwtToken);
         localStorage.setItem("refreshToken", data.refreshToken);
+
+        // Extract and save userId
+        const decoded = parseJwt(data.jwtToken);
+        if (decoded?.userID) {
+          localStorage.setItem("userId", decoded.userID);
+        }
+        if (decoded?.role) {
+          localStorage.setItem("role", decoded.role);
+        }
+
         window.location.href = "/dashboard";
       }
     } catch (err) {
@@ -146,6 +166,16 @@ export default function LoginPage() {
       } else {
         localStorage.setItem("accessToken", data.jwtToken);
         localStorage.setItem("refreshToken", data.refreshToken);
+
+        // Extract and save userId
+        const decoded = parseJwt(data.jwtToken);
+        if (decoded?.userID) {
+          localStorage.setItem("userId", decoded.userID);
+        }
+        if (decoded?.role) {
+          localStorage.setItem("role", decoded.role);
+        }
+
         window.location.href = "/dashboard";
       }
     } catch (err) {
@@ -173,7 +203,7 @@ export default function LoginPage() {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       <div className="glass-card">
-        
+
         <h1 className="title">Lovely Travels</h1>
 
         {error && <p className="error-msg">{error}</p>}
