@@ -12,11 +12,11 @@ import OauthSuccess from "./OauthSuccess";
 
 // Pages
 import Hotels from "./pages/Hotels";
-import Cabs from "./cabs/Cabs";
-import RegisterCab from "./cabs/RegisterCab";
+import Cabs from "./CabModule/Cabs";
+import RegisterCab from "./CabModule/RegisterCab";
 import RegisterHotel from "./pages/RegisterHotel";
 import Profile from "./pages/Profile";
-import DriverPanel from "./cabs/driver/DriverPanel";
+import DriverPanel from "./CabModule/driver/DriverPanel";
 import BookingPage from "./pages/BookingPage";
 import Support from "./pages/Support";
 import Bookings from "./pages/Bookings";
