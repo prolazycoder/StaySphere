@@ -38,7 +38,7 @@ export default function RegisterCab() {
             const authHeader = `Bearer ${token}`;
 
             // 1. Register Driver
-            const registerRes = await fetch("http://localhost:8080/api/driver/register", {
+            const registerRes = await fetch(`${import.meta.env.VITE_API_URL}/api/driver/register`, {
                 method: "POST",
                 headers: {
                     "Authorization": authHeader,
@@ -59,7 +59,7 @@ export default function RegisterCab() {
                 vehicleType: form.vehicleType
             };
 
-            const vehicleRes = await fetch("http://localhost:8080/api/driver/vehicle-register", {
+            const vehicleRes = await fetch(`${import.meta.env.VITE_API_URL}/api/driver/vehicle-register`, {
                 method: "POST",
                 headers: {
                     "Authorization": authHeader,

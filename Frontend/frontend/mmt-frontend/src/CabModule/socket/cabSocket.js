@@ -4,7 +4,7 @@ import { Client } from "@stomp/stompjs";
 let client = null;
 
 export const connectCabSocket = ({ onConnect, onError } = {}) => {
-    const socket = new SockJS("http://localhost:8080/ws-driver");
+    const socket = new SockJS(`${import.meta.env.VITE_API_URL}/ws-driver`);
 
     client = new Client({
         webSocketFactory: () => socket,
