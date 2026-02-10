@@ -98,12 +98,12 @@ public class GoogleAuthController {
         //         + "&pictureUrl=" + URLEncoder.encode(pictureUrl, StandardCharsets.UTF_8);
 
         String tempCode = UUID.randomUUID().toString();
-
+        logger.info("Storing OAuth temp code in Redis: oauth:{} (TTL=120s)", tempCode);
         // store JWTs temporarily in Redis (5 minutes)
         redisService.save(
                 "oauth:" + tempCode,
                 jwtData,
-            5
+            10
     );
 
     String redirectUrl =
@@ -116,7 +116,7 @@ public class GoogleAuthController {
 
     @GetMapping("/auth/exchange")
     public ResponseEntity<?> exchange(@RequestParam String code) {
-
+        logger.info("Exchanging OAuth code: {}", code);
         Object data = redisService.get("oauth:" + code);
 
         if (data == null) {
