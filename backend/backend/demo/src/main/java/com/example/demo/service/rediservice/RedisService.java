@@ -18,7 +18,7 @@ public class RedisService {
 
     public void save(String key, Object value, long minutes) {
         try {
-            if (minutes <= 0) minutes = 10; // safe default
+            if (minutes <= 10) minutes = 10; // safe default
 
             String json = objectMapper.writeValueAsString(value);
 
