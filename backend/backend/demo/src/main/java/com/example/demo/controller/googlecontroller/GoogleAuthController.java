@@ -4,19 +4,23 @@ import java.nio.charset.StandardCharsets;
 
 import com.example.demo.dto.UserAdditionalInfoDTO;
 import com.example.demo.service.googleservice.GoogleAuthService;
+import com.example.demo.service.rediservice.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +28,8 @@ import java.util.Map;
 public class GoogleAuthController {
 
     private final GoogleAuthService googleAuthService;
+    @Autowired
+    private final RedisService redisService;
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleAuthController.class);
 
@@ -49,22 +55,22 @@ public class GoogleAuthController {
         response.sendRedirect(googleAuthUrl);
     }
 
-//
+    //
 //    @GetMapping(value = "/auth/google/callback")
 //    @Operation(summary = "Google OAuth2 callback", description = "Google redirects here with code, backend returns JWT")
 //    public Map<String, Object> googleCallback(@RequestParam("code") String code) {
 //        logger.info("Received Google OAuth2 callback with code: {}", code);
-//
-//
+    //
+    //
 //        Map<String, Object> jwtData = googleAuthService.authenticateWithGoogleCode(code);
-//
+    //
 //        logger.info("Google authentication successful for email: {}", jwtData.get("email"));
 //        logger.debug("JWT Data: {}", jwtData);
-//
-//
+    //
+    //
 //        return jwtData;
-//
-//
+    //
+    //
 //    }
 
     @GetMapping("/auth/google/callback")
@@ -78,25 +84,52 @@ public class GoogleAuthController {
         // Authenticate user and generate tokens
         Map<String, Object> jwtData = googleAuthService.authenticateWithGoogleCode(code);
 
-        String accessToken = (String) jwtData.get("jwtToken");
-        String refreshToken = (String) jwtData.get("refreshToken");
-        String fullName = (String) jwtData.get("fullName");
-        String email = (String) jwtData.get("email");
-        String pictureUrl = (String) jwtData.get("pictureUrl");
+        // String accessToken = (String) jwtData.get("jwtToken");
+        // String refreshToken = (String) jwtData.get("refreshToken");
+        // String fullName = (String) jwtData.get("fullName");
+        // String email = (String) jwtData.get("email");
+        // String pictureUrl = (String) jwtData.get("pictureUrl");
 
-        String redirectUrl = "https://stay-sphere-s6je.vercel.app/oauth-success"
-                + "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
-                + "&refreshToken=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8)
-                + "&fullName=" + URLEncoder.encode(fullName, StandardCharsets.UTF_8)
-                + "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
-                + "&pictureUrl=" + URLEncoder.encode(pictureUrl, StandardCharsets.UTF_8);
+        // String redirectUrl = "https://stay-sphere-s6je.vercel.app/oauth-success"
+        //         + "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
+        //         + "&refreshToken=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8)
+        //         + "&fullName=" + URLEncoder.encode(fullName, StandardCharsets.UTF_8)
+        //         + "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
+        //         + "&pictureUrl=" + URLEncoder.encode(pictureUrl, StandardCharsets.UTF_8);
 
+        String tempCode = UUID.randomUUID().toString();
+
+        // store JWTs temporarily in Redis (5 minutes)
+        redisService.save(
+                "oauth:" + tempCode,
+                jwtData,
+            5
+    );
+
+    String redirectUrl =
+            "https://stay-sphere-s6je.vercel.app/oauth-success?code=" + tempCode;
         response.sendRedirect(redirectUrl);
 
 
         //response.sendRedirect(redirectUrl);
     }
 
+    @GetMapping("/auth/exchange")
+    public ResponseEntity<?> exchange(@RequestParam String code) {
+
+        Object data = redisService.get("oauth:" + code);
+
+        if (data == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid or expired OAuth code");
+        }
+
+        // One-time use
+        redisService.delete("oauth:" + code);
+
+        return ResponseEntity.ok(data);
+    }
 
 
 }

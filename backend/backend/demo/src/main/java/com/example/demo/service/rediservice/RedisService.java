@@ -12,11 +12,10 @@ public class RedisService {
     private RedisTemplate<String,Object> redisTemplate;
 
     public void  save(String key , Object object,long time){
-        if(time > 0){
-            redisTemplate.opsForValue().set(key,object,time, TimeUnit.SECONDS);
-        }else{
-            redisTemplate.opsForValue().set(key,object);
+        if (time <= 0) {
+            time = 5; // fallback
         }
+        redisTemplate.opsForValue().set(key,object,time, TimeUnit.MINUTES);
     }
 
     public Object get(String key){
