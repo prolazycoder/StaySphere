@@ -84,7 +84,7 @@ public class GoogleAuthController {
         String email = (String) jwtData.get("email");
         String pictureUrl = (String) jwtData.get("pictureUrl");
 
-        String redirectUrl = "http://localhost:5173/oauth-success"
+        String redirectUrl = "https://stay-sphere-s6je.vercel.app/oauth-success"
                 + "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
                 + "&refreshToken=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8)
                 + "&fullName=" + URLEncoder.encode(fullName, StandardCharsets.UTF_8)
