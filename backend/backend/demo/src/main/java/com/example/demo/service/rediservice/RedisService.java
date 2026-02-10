@@ -44,4 +44,8 @@ public class RedisService {
     public void delete(String key) {
         redisTemplate.delete(key);
     }
+    public boolean exist(String key) {
+        Boolean exists = redisTemplate.hasKey(key);
+        return exists != null && exists;
+    }
 }
