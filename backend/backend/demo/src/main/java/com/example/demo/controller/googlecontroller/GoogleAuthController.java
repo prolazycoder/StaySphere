@@ -116,16 +116,14 @@ public class GoogleAuthController {
 
     @GetMapping("/auth/exchange")
     public ResponseEntity<?> exchange(@RequestParam String code) {
-        logger.info("Exchanging OAuth code: {}", code);
-        Object data = redisService.get("oauth:" + code);
+
+        Map<String, Object> data = redisService.get("oauth:" + code);
 
         if (data == null) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid or expired OAuth code");
         }
 
-        // One-time use
         redisService.delete("oauth:" + code);
 
         return ResponseEntity.ok(data);

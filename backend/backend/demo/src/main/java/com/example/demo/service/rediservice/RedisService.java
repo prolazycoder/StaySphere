@@ -1,32 +1,47 @@
 package com.example.demo.service.rediservice;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class RedisService {
-    @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
 
-    public void  save(String key , Object object,long time){
-        if (time <= 0) {
-            time = 5; // fallback
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public void save(String key, Object value, long minutes) {
+        try {
+            if (minutes <= 0) minutes = 10; // safe default
+
+            String json = objectMapper.writeValueAsString(value);
+
+            redisTemplate.opsForValue()
+                    .set(key, json, minutes, TimeUnit.MINUTES);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Redis save failed", e);
         }
-        redisTemplate.opsForValue().set(key,object,time, TimeUnit.MINUTES);
     }
 
-    public Object get(String key){
-        return redisTemplate.opsForValue().get(key);
+    public Map<String, Object> get(String key) {
+        try {
+            String json = redisTemplate.opsForValue().get(key);
+            if (json == null) return null;
+
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (Exception e) {
+            return null;
+        }
     }
-    public void delete(String key){
+
+    public void delete(String key) {
         redisTemplate.delete(key);
     }
-
-    public boolean exist(String key){
-        return redisTemplate.hasKey(key);
-    }
-
 }
