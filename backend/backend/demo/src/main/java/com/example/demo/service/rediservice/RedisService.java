@@ -18,12 +18,12 @@ public class RedisService {
 
     public void save(String key, Object value, long minutes) {
         try {
-            if (minutes <= 10) minutes = 10; // safe default
+            if (minutes <= 0) minutes = 600000; // safe default
 
             String json = objectMapper.writeValueAsString(value);
 
             redisTemplate.opsForValue()
-                    .set(key, json, minutes, TimeUnit.MINUTES);
+                    .set(key, json, minutes, TimeUnit.MILLISECONDS);
 
         } catch (Exception e) {
             throw new RuntimeException("Redis save failed", e);
