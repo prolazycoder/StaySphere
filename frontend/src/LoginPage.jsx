@@ -27,7 +27,7 @@ export default function LoginPage() {
 
   // ================= GOOGLE LOGIN =================
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/auth/google/login";
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google/login`;
   };
 
   // ================= EMAIL OTP =================
@@ -47,7 +47,7 @@ export default function LoginPage() {
       const timeout = setTimeout(() => controller.abort(), 20000);
 
       const res = await fetch(
-        `http://localhost:8080/auth/otp/send?email=${email}`,
+        `${import.meta.env.VITE_API_URL}/auth/otp/send?email=${email}`,
         { method: "POST", signal: controller.signal }
       );
 
@@ -76,7 +76,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/auth/otp/verify", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/otp/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ otpToken: emailToken, otp: emailOtp }),
@@ -119,7 +119,7 @@ export default function LoginPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/auth/phone/send?phone=${phone}`,
+        `${import.meta.env.VITE_API_URL}/auth/phone/send?phone=${phone}`,
         { method: "POST" }
       );
 
@@ -142,7 +142,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/auth/phone/verify", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/phone/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
