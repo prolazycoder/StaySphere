@@ -1,0 +1,242 @@
+/* Profile.css - Premium Modern Design */
+
+.profileWrap {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1a1a1a;
+}
+
+.profileCard {
+    background: #ffffff;
+    border: 1px solid #f0f0f0;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+}
+
+.loadingText {
+    font-weight: 600;
+    color: #4b5563;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+/* Header */
+.profileHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.profileTitle {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #111827 0%, #4f46e5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.profileSubtitle {
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+/* Avatar row */
+.avatarRow {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #f9fafb;
+}
+
+.avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    flex-shrink: 0;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar span {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.avatarRight {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* grid */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 650px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* fields */
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 0.9rem;
+    color: #4b5563;
+    font-weight: 600;
+}
+
+.value {
+    border: 1px solid transparent;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: #1f2937;
+    background: #f3f4f6;
+    font-size: 1rem;
+}
+
+.value.muted {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.input,
+.select {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    outline: none;
+    font-weight: 500;
+    font-size: 1rem;
+    background: #fff;
+    color: #1f2937;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input:focus,
+.select:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+/* actions */
+.actions {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+}
+
+/* alert */
+.alertError {
+    margin-bottom: 24px;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* buttons */
+.btn {
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btnPrimary {
+    background: #111827;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(17, 24, 39, 0.15);
+}
+
+.btnPrimary:hover:not(:disabled) {
+    background: #1f2937;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(17, 24, 39, 0.25);
+}
+
+.btnOutline {
+    background: #fff;
+    color: #4f46e5;
+    border: 1px solid #c7d2fe;
+}
+
+.btnOutline:hover:not(:disabled) {
+    background: #eef2ff;
+    border-color: #a5b4fc;
+}
+
+.btnGhost {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.btnGhost:hover:not(:disabled) {
+    background: #e5e7eb;
+    color: #1f2937;
+}

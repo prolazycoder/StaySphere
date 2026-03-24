@@ -1,0 +1,73 @@
+/* InfoPages.css */
+.info-page-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1a1a1a;
+}
+
+.info-content-card {
+    background: #ffffff;
+    border: 1px solid #f0f0f0;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+}
+
+.info-title {
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #111827;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 16px;
+}
+
+.info-last-updated {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.info-section {
+    margin-bottom: 30px;
+}
+
+.info-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 16px;
+}
+
+.info-section p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #4b5563;
+    margin-bottom: 16px;
+}
+
+.info-section ul {
+    padding-left: 20px;
+    margin-bottom: 16px;
+}
+
+.info-section li {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.info-section strong {
+    color: #111827;
+    font-weight: 700;
+}
+
+@media (max-width: 600px) {
+    .info-content-card {
+        padding: 30px 20px;
+    }
+}

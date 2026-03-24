@@ -1,0 +1,129 @@
+.bm-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.52);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 999;
+}
+
+.bm-modal {
+    width: min(720px, 100%);
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.25);
+    padding: 18px;
+}
+
+.bm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.bm-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 900;
+    color: #111827;
+}
+
+.bm-subtitle {
+    margin-top: 6px;
+    margin-bottom: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.bm-close {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.bm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.bm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bm-field label {
+    font-size: 12px;
+    font-weight: 900;
+    color: #374151;
+}
+
+.bm-field input,
+.bm-field select {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 12px;
+    outline: none;
+    font-size: 14px;
+}
+
+.bm-alert {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.bm-error {
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #9f1239;
+}
+
+.bm-success {
+    background: #ecfdf5;
+    border: 1px solid #6ee7b7;
+    color: #065f46;
+}
+
+.bm-footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.bm-btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.bm-btn.ghost {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #111827;
+}
+
+.bm-btn.primary {
+    border: none;
+    background: #111827;
+    color: #fff;
+}
+
+.bm-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
