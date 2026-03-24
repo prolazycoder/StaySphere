@@ -36,6 +36,9 @@ public class GoogleAuthController {
     @Value("${spring.security.oauth2.client.registration.google.scope}")
     private String scope;
 
+    @Value("${FRONTEND_URL:https://stay-sphere-two.vercel.app}")
+    private String frontendUrl;
+
     @GetMapping("/auth/google/login")
     public void loginWithGoogle(HttpServletResponse response) throws IOException {
         String googleScope = scope.replace(",", " ");
@@ -66,12 +69,12 @@ public class GoogleAuthController {
         String email = (String) jwtData.get("email");
         String pictureUrl = (String) jwtData.get("pictureUrl");
 
-        String redirectUrl = "http://localhost:5173/oauth-success"
-                + "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
-                + "&refreshToken=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8)
-                + "&fullName=" + URLEncoder.encode(fullName, StandardCharsets.UTF_8)
-                + "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
-                + "&pictureUrl=" + URLEncoder.encode(pictureUrl, StandardCharsets.UTF_8);
+        String redirectUrl = frontendUrl + "/oauth-success"
+                + "?accessToken=" + (accessToken != null ? URLEncoder.encode(accessToken, StandardCharsets.UTF_8) : "")
+                + "&refreshToken=" + (refreshToken != null ? URLEncoder.encode(refreshToken, StandardCharsets.UTF_8) : "")
+                + "&fullName=" + (fullName != null ? URLEncoder.encode(fullName, StandardCharsets.UTF_8) : "")
+                + "&email=" + (email != null ? URLEncoder.encode(email, StandardCharsets.UTF_8) : "")
+                + "&pictureUrl=" + (pictureUrl != null ? URLEncoder.encode(pictureUrl, StandardCharsets.UTF_8) : "");
 
         response.sendRedirect(redirectUrl);
 
