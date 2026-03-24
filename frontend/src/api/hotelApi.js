@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Explicitly define the Spring Boot 8080 backend host
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const createHotelOwner = async (token) => {
     return await axios.post(`${API_URL}/api/v1/hotel-owner/create-owner`, {}, {
